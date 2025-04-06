@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portugal Travel Planner</title>
+
+    <!-- MapLibre GL JS CSS -->
+    <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
+
+    <!-- Custom CSS -->
+    <style>
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: sans-serif;
+            overflow: hidden; /* Prevent body scrollbars */
+        }
+
+        /* Main Layout Container */
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Planner Panel Styling */
+        #planner-panel {
+            width: 350px; /* Wider panel */
+            height: 100%;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 15px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #planner-panel h2, #planner-panel h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+         #planner-panel h3 {
+             font-size: 1.1em;
+             margin-top: 15px;
+             color: #333;
+             border-bottom: 1px solid #ddd;
+             padding-bottom: 5px;
+         }
+
+        .planner-section {
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+        .planner-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+         .planner-section select, .planner-section button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+         }
+
+        /* Lists styling */
+        .scrollable-list {
+            max-height: 200px; /* Limit height for lists */
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 5px;
+            margin-bottom: 10px;
+            background-color: #fff;
+        }
+        #destination-list, #daily-plan-list, #planned-destinations-list, #transport-suggestions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #destination-list li, #daily-plan-list li {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            font-size: 0.9em;
+            border: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+        #destination-list li:hover, #daily-plan-list li:hover {
+            background-color: #e9ecef;
+        }
+        #destination-list li.selected {
+            background-color: #cfe2ff;
+            border-color: #9ec5fe;
+            font-weight: bold;
+        }
+
+        #plan-details {
+           flex-grow: 1; /* Takes remaining space */
+           overflow-y: auto; /* Scroll for long plans */
+           border-top: 1px solid #ccc;
+           margin-top: 15px;
+           padding-top: 10px;
+        }
+         #plan-details h4 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+             font-size: 1em;
+             color: #555;
+         }
+
+         #planned-destinations-list li {
+            padding: 5px 0;
+            font-size: 0.9em;
+             border-bottom: 1px dashed #eee;
+         }
+         #planned-destinations-list li:last-child {
+             border-bottom: none;
+         }
+
+        #plan-summary {
+            margin-top: 10px;
+            font-size: 0.95em;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        #plan-summary p { margin-bottom: 5px; }
+
+        #plan-transport li {
+             font-size: 0.85em;
+             margin-bottom: 8px;
+             padding-left: 20px;
+             position: relative;
+         }
+         #plan-transport li::before {
+             content: "🚶";
+             position: absolute;
+             left: 0; top: 0;
+             font-size: 1.1em;
+         }
+         #plan-transport li.transport-needed::before {
+             content: "🚌"; /* Simpler icon */
+         }
+
+
+        #clear-plan-btn {
+            padding: 10px 12px;
+            cursor: pointer;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            flex-shrink: 0;
+            margin-top: auto; /* Push to bottom */
+        }
+        #clear-plan-btn:hover { background-color: #c82333; }
+
+        /* Map Container Styling */
+        #map {
+            flex-grow: 1;
+            height: 100%;
+            position: relative;
+        }
+
+         /* Loading indicator */
+        #map::before { content: 'Loading Map...'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5em; color: #555; z-index: 1; }
+        #map.loaded::before { display: none; }
+
+        /* Marker Animation */
+        .maplibregl-marker { cursor: pointer; } /* Make default marker clickable looking */
+
+        .dropped-pin {
+            width: 30px;
+            height: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="%23dc3545" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67a24 24 0 0 1-35.464 0zM192 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform-origin: bottom center;
+            animation: dropAnimation 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        @keyframes dropAnimation {
+            0% { transform: translateY(-100px) scale(0.8); opacity: 0; }
+            60% { transform: translateY(5px) scale(1.05); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* Route Point Marker Styling */
+        .route-point-marker {
+            background-color: #0d6efd; /* Blue to match route */
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+         /* MapLibre Popup customization */
+         .maplibregl-popup-content {
+            font-size: 0.9em;
+            padding: 10px;
+            max-width: 250px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+         }
+         .maplibregl-popup-content h4 {
+             margin: 0 0 5px 0;
+             font-size: 1.1em;
+             color: #333;
+         }
+         .maplibregl-popup-content p {
+             margin: 0;
+             color: #555;
+         }
+        .maplibregl-popup-close-button {
+            font-size: 1.5em;
+            padding: 0 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Planner Panel -->
+        <div id="planner-panel">
+            <h2>Portugal Travel Planner</h2>
+
+            <div class="planner-section">
+                <label for="city-select">Select City:</label>
+                <select id="city-select"></select>
+            </div>
+
+            <div class="planner-section">
+                <h3>Available Destinations</h3>
+                <div class="scrollable-list">
+                    <ul id="destination-list">
+                        <!-- Destinations loaded dynamically -->
+                    </ul>
+                </div>
+            </div>
+
+             <div class="planner-section">
+                <h3>Suggested Daily Plans</h3>
+                <div class="scrollable-list">
+                    <ul id="daily-plan-list">
+                        <!-- Daily plans loaded dynamically -->
+                    </ul>
+                </div>
+            </div>
+
+            <div id="plan-details">
+                 <h4>Your Current Plan</h4>
+                 <ul id="planned-destinations-list">
+                     <li>Select destinations or a daily plan.</li>
+                 </ul>
+
+                 <div id="plan-summary" style="display: none;">
+                     <h4>Summary</h4>
+                     <p id="total-distance">Total Walking Distance: calculating...</p>
+                 </div>
+
+                 <div id="plan-transport" style="display: none;">
+                     <h4>Transport Suggestions</h4>
+                     <ul id="transport-suggestions-list"></ul>
+                 </div>
+            </div>
+
+
+            <button id="clear-plan-btn">Clear Current Plan</button>
+        </div>
+
+        <!-- Map Container -->
+        <div id="map"></div>
+    </div>
+
+    <!-- MapLibre GL JS -->
+    <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
+    <!-- Three.js (Optional for future custom 3D) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.min.js"></script>
+    <!-- Threebox (Optional for future custom 3D) -->
+    <script src="https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js" type="text/javascript"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // --- Configuration ---
+        const OSRM_API_URL = 'https://router.project-osrm.org/route/v1/walking/';
+        const TRANSPORT_SUGGESTION_THRESHOLD_METERS = 1500; // 1.5km
+
+        // --- City Data ---
+        const CITIES_DATA = {
+            "Lisbon": {
+                center: [-9.1393, 38.7223],
+                zoom: 13,
+                destinations: [
+                    { name: "Praça do Comércio", lng: -9.1426, lat: 38.7139, info: "Iconic plaza facing the Tagus River, rebuilt after the 1755 earthquake." },
+                    { name: "São Jorge Castle", lng: -9.1333, lat: 38.7121, info: "Hilltop Moorish castle with archaeological site & panoramic city views." },
+                    { name: "Alfama District Viewpoint", lng: -9.1313, lat: 38.7129, info: "Miradouro de Santa Luzia offers stunning views over Alfama and the river." },
+                    { name: "Jerónimos Monastery", lng: -9.2056, lat: 38.6976, info: "UNESCO World Heritage site, masterpiece of Manueline architecture." },
+                    { name: "Belém Tower", lng: -9.2159, lat: 38.6916, info: "Fortified tower on the Tagus, symbol of the Age of Discoveries. UNESCO site." },
+                    { name: "Santa Justa Lift", lng: -9.1450, lat: 38.7080, info: "Neo-Gothic iron elevator connecting Baixa to Bairro Alto, designed by Ponsard." },
+                    { name: "Parque das Nações", lng: -9.1565, lat: 38.7436, info: "Modern district built for Expo '98, home to the Oceanário de Lisboa." },
+                    { name: "Lisbon Cathedral (Sé)", lng: -9.1371, lat: 38.7143, info: "The oldest church in the city, a mix of Romanesque, Gothic, and Baroque styles." },
+                    { name: "Time Out Market", lng: -9.1470, lat: 38.7066, info: "Lively food hall with curated stalls from top Lisbon chefs and restaurants." }
+                ],
+                dailyPlans: [
+                    { name: "Day 1: History & Views", sequence: ["Lisbon Cathedral (Sé)", "São Jorge Castle", "Alfama District Viewpoint", "Praça do Comércio"] },
+                    { name: "Day 2: Belém & Discoveries", sequence: ["Jerónimos Monastery", "Belém Tower", "Padrão dos Descobrimentos"] }, // Note: Padrão not in list, add it or remove
+                    { name: "Day 3: Baixa & Bairro Alto", sequence: ["Santa Justa Lift", "Rossio Square", "Time Out Market"] } // Note: Rossio Square not in list
+                ]
+            },
+            "Porto": {
+                center: [-8.6109, 41.1496],
+                zoom: 13.5,
+                destinations: [
+                    { name: "Ribeira Square", lng: -8.6129, lat: 41.1407, info: "Picturesque riverside square in the historic center, a UNESCO site." },
+                    { name: "Dom Luís I Bridge", lng: -8.6100, lat: 41.1400, info: "Iconic double-deck metal arch bridge designed by a student of Eiffel." },
+                    { name: "Clérigos Church & Tower", lng: -8.6146, lat: 41.1457, info: "Baroque church with a tall bell tower offering panoramic city views." },
+                    { name: "Livraria Lello", lng: -8.6146, lat: 41.1469, info: "Ornate, historic bookstore often cited as inspiration for Harry Potter." },
+                    { name: "São Bento Train Station", lng: -8.6107, lat: 41.1455, info: "Famous for its main hall covered in beautiful Azulejo tile panels." },
+                    { name: "Port Wine Cellars (Gaia)", lng: -8.6139, lat: 41.1378, info: "Located across the river in Vila Nova de Gaia, offering tours and tastings." },
+                    { name: "Serralves Museum & Villa", lng: -8.6595, lat: 41.1596, info: "Contemporary art museum set in parklands with an Art Deco villa." }
+                ],
+                 dailyPlans: [
+                    { name: "Day 1: Riverside & Bridge", sequence: ["Ribeira Square", "Dom Luís I Bridge", "Port Wine Cellars (Gaia)"] },
+                    { name: "Day 2: Tiles & Towers", sequence: ["São Bento Train Station", "Clérigos Church & Tower", "Livraria Lello"] },
+                ]
+            }
+            // Add more cities here...
+        };
+
+        // --- State Variables ---
+        let map;
+        let tb; // Threebox instance (optional)
+        let currentCity = Object.keys(CITIES_DATA)[0]; // Start with the first city
+        let plannedRoutePoints = []; // Array of {name, lng, lat, info} objects
+        let destinationListItems = {}; // Cache of current city's list items {name: liElement}
+        let routeMarkers = []; // Store markers placed on the route
+        let clickedMarker = null; // Store the marker from a map click
+        let clickedMarkerPopup = null; // Store the popup for the map click marker
+
+        // --- DOM Element References ---
+        const citySelect = document.getElementById('city-select');
+        const destinationListUl = document.getElementById('destination-list');
+        const dailyPlanListUl = document.getElementById('daily-plan-list');
+        const plannedDestinationsListUl = document.getElementById('planned-destinations-list');
+        const planSummaryDiv = document.getElementById('plan-summary');
+        const totalDistanceP = document.getElementById('total-distance');
+        const planTransportDiv = document.getElementById('plan-transport');
+        const transportSuggestionsListUl = document.getElementById('transport-suggestions-list');
+        const clearPlanBtn = document.getElementById('clear-plan-btn');
+
+        // --- Initialization ---
+        function initializePlanner() {
+            // Populate city selector
+            Object.keys(CITIES_DATA).forEach(cityName => {
+                const option = document.createElement('option');
+                option.value = cityName;
+                option.textContent = cityName;
+                citySelect.appendChild(option);
+            });
+            citySelect.value = currentCity;
+
+            // Initialize Map
+            map = new maplibregl.Map({
+                container: 'map',
+                style: {
+                    version: 8,
+                    sources: { 'osm-tiles': { type: 'raster', tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; OSM contributors | Routing: OSRM' } },
+                    layers: [{ id: 'osm-raster-layer', type: 'raster', source: 'osm-tiles', minzoom: 0, maxzoom: 20 }]
+                },
+                center: CITIES_DATA[currentCity].center,
+                zoom: CITIES_DATA[currentCity].zoom,
+                pitch: 45,
+                bearing: -10,
+                antialias: true
+            });
+
+            map.on('style.load', () => {
+                document.getElementById('map').classList.add('loaded');
+                // Optional: Initialize Threebox if needed for custom 3D later
+                // tb = new Threebox(map, map.getCanvas().getContext('webgl'), { defaultLights: true });
+                console.log("Map style loaded.");
+                addRouteLayerAndSource(); // Add empty layer/source for the route
+                updateCityUI(currentCity); // Load initial city UI
+            });
+
+            map.addControl(new maplibregl.NavigationControl());
+            map.addControl(new maplibregl.FullscreenControl());
+
+            // --- Event Listeners ---
+            citySelect.addEventListener('change', (e) => {
+                switchCity(e.target.value);
+            });
+            destinationListUl.addEventListener('click', handleDestinationClick);
+            dailyPlanListUl.addEventListener('click', handleDailyPlanClick);
+            clearPlanBtn.addEventListener('click', clearPlan);
+            map.on('click', handleMapClick); // Listener for map clicks
+
+            map.on('error', (e) => {
+                console.error('MapLibre GL Error:', e.error);
+                alert('An error occurred with the map.');
+            });
+        }
+
+        // --- City & UI Update Functions ---
+
+        function switchCity(cityName) {
+            if (cityName === currentCity || !CITIES_DATA[cityName]) return;
+            currentCity = cityName;
+            console.log("Switching to city:", currentCity);
+            clearPlan(); // Clear plan when switching cities
+            updateCityUI(cityName);
+            const cityData = CITIES_DATA[cityName];
+            map.flyTo({
+                center: cityData.center,
+                zoom: cityData.zoom,
+                pitch: 45,
+                bearing: -10,
+                duration: 2000
+            });
+        }
+
+        function updateCityUI(cityName) {
+            const cityData = CITIES_DATA[cityName];
+            destinationListItems = {}; // Clear cache for old city
+            destinationListUl.innerHTML = '';
+            dailyPlanListUl.innerHTML = '';
+
+            // Populate Destinations
+            if (cityData.destinations) {
+                cityData.destinations.forEach(dest => {
+                    const li = document.createElement('li');
+                    li.textContent = dest.name;
+                    li.dataset.name = dest.name;
+                    li.dataset.lng = dest.lng;
+                    li.dataset.lat = dest.lat;
+                    destinationListUl.appendChild(li);
+                    destinationListItems[dest.name] = li; // Cache the element
+                });
+            }
+
+            // Populate Daily Plans
+            if (cityData.dailyPlans) {
+                cityData.dailyPlans.forEach((plan, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = plan.name;
+                    li.dataset.planIndex = index;
+                    dailyPlanListUl.appendChild(li);
+                });
+            }
+        }
+
+        // --- Event Handlers ---
+
+        function handleDestinationClick(event) {
+            if (event.target && event.target.nodeName === 'LI' && event.target.dataset.name) {
+                const listItem = event.target;
+                const name = listItem.dataset.name;
+                const cityData = CITIES_DATA[currentCity];
+                const destinationData = cityData.destinations.find(d => d.name === name);
+
+                if (destinationData && !listItem.classList.contains('selected')) {
+                     // Check if already in plan to prevent duplicates (optional)
+                     if (plannedRoutePoints.some(p => p.name === name)) return;
+
+                    plannedRoutePoints.push({ ...destinationData }); // Add copy to plan
+                    listItem.classList.add('selected');
+                    updatePlannerUIAndRoute();
+                } else if (destinationData && listItem.classList.contains('selected')) {
+                    // Optional: Allow deselecting by clicking again
+                     plannedRoutePoints = plannedRoutePoints.filter(p => p.name !== name);
+                     listItem.classList.remove('selected');
+                     updatePlannerUIAndRoute();
+                }
+            }
+        }
+
+         function handleDailyPlanClick(event) {
+             if (event.target && event.target.nodeName === 'LI' && event.target.dataset.planIndex) {
+                 const planIndex = parseInt(event.target.dataset.planIndex, 10);
+                 const cityData = CITIES_DATA[currentCity];
+                 const selectedPlan = cityData.dailyPlans[planIndex];
+
+                 if (selectedPlan) {
+                     clearPlan(false); // Clear current plan without resetting map view
+
+                     plannedRoutePoints = selectedPlan.sequence
+                         .map(destName => cityData.destinations.find(d => d.name === destName))
+                         .filter(dest => dest !== undefined); // Find destination objects, filter out any not found
+
+                    // Visually select list items for this plan
+                     Object.values(destinationListItems).forEach(li => li.classList.remove('selected'));
+                     plannedRoutePoints.forEach(point => {
+                         if (destinationListItems[point.name]) {
+                             destinationListItems[point.name].classList.add('selected');
+                         }
+                     });
+
+                     updatePlannerUIAndRoute();
+                 }
+             }
+         }
+
+        function handleMapClick(e) {
+             // Remove previous clicked marker & popup
+             if (clickedMarker) clickedMarker.remove();
+             if (clickedMarkerPopup) clickedMarkerPopup.remove();
+
+             const coordinates = e.lngLat;
+
+            // Create custom HTML element for animation
+            const el = document.createElement('div');
+            el.className = 'dropped-pin';
+
+             // Create Marker with custom element
+             clickedMarker = new maplibregl.Marker(el)
+                 .setLngLat(coordinates)
+                 .addTo(map);
+
+             // Create Popup
+             clickedMarkerPopup = new maplibregl.Popup({ offset: 45, closeButton: true, closeOnClick: false }) // Keep open until explicitly closed or another click
+                 .setLngLat(coordinates)
+                 .setHTML(`<strong>Clicked Location</strong><p>Lng: ${coordinates.lng.toFixed(5)}<br>Lat: ${coordinates.lat.toFixed(5)}</p>`)
+                 .addTo(map);
+
+             // Optional: Remove marker after popup closes
+             clickedMarkerPopup.on('close', () => {
+                 if (clickedMarker) clickedMarker.remove();
+                 clickedMarker = null;
+                 clickedMarkerPopup = null;
+             });
+
+             console.log(`Map clicked at: Lng: ${coordinates.lng}, Lat: ${coordinates.lat}`);
+             // Note: We are NOT adding this arbitrary click to the plan.
+         }
+
+
+        // --- Planning & Routing Logic ---
+
+        function updatePlannerUIAndRoute() {
+            updatePlannerUI(); // Update the text list in the sidebar
+            if (plannedRoutePoints.length >= 2) {
+                calculateAndDrawRoute();
+            } else {
+                 clearRouteDisplay(); // Clear route line if < 2 points
+                 clearRouteMarkers(); // Clear markers if < 2 points
+                 // Optionally fly to the single point if needed
+                 if (plannedRoutePoints.length === 1) {
+                     map.flyTo({ center: [plannedRoutePoints[0].lng, plannedRoutePoints[0].lat], zoom: 15, duration: 1000});
+                      addRouteMarkers(); // Add marker for the single point
+                 }
+            }
+        }
+
+        function updatePlannerUI() {
+            plannedDestinationsListUl.innerHTML = ''; // Clear previous list
+
+            if (plannedRoutePoints.length === 0) {
+                 plannedDestinationsListUl.innerHTML = '<li>Select destinations or a daily plan.</li>';
+                 planSummaryDiv.style.display = 'none';
+                 planTransportDiv.style.display = 'none';
+                 return;
+            }
+
+            plannedRoutePoints.forEach((point, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${point.name}`;
+                plannedDestinationsListUl.appendChild(li);
+            });
+
+            planSummaryDiv.style.display = 'block';
+            planTransportDiv.style.display = 'block';
+            totalDistanceP.textContent = 'Total Walking Distance: calculating...';
+            transportSuggestionsListUl.innerHTML = '<li>Calculating suggestions...</li>';
+        }
+
+         function addRouteLayerAndSource() {
+            if (!map.getSource('route')) {
+                map.addSource('route', { type: 'geojson', data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } } });
+            }
+            if (!map.getLayer('route-line')) {
+                map.addLayer({ id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#0d6efd', 'line-width': 5, 'line-opacity': 0.8 } });
+            }
+         }
+
+        async function calculateAndDrawRoute() {
+            if (plannedRoutePoints.length < 2) return;
+            clearRouteMarkers(); // Clear old markers before drawing new route/markers
+
+            const coordsString = plannedRoutePoints.map(p => `${p.lng},${p.lat}`).join(';');
+            const requestUrl = `${OSRM_API_URL}${coordsString}?overview=full&geometries=geojson&steps=true`;
+
+            console.log("Requesting route:", requestUrl);
+            try {
+                const response = await fetch(requestUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    map.getSource('route').setData(route.geometry); // Update map source
+                    totalDistanceP.textContent = `Total Walking Distance: ${(route.distance / 1000).toFixed(2)} km`;
+                    updateTransportSuggestions(data.routes[0].legs);
+                    addRouteMarkers(); // Add markers AFTER route is calculated
+
+                    // Fit map to route bounds
+                    const bounds = route.geometry.coordinates.reduce((bounds, coord) => bounds.extend(coord), new maplibregl.LngLatBounds(route.geometry.coordinates[0], route.geometry.coordinates[0]));
+                    map.fitBounds(bounds, { padding: 80, duration: 1500, pitch: map.getPitch(), bearing: map.getBearing() });
+                } else {
+                    handleRouteError(data.message || "No route found");
+                }
+            } catch (error) {
+                handleRouteError(error.message);
+                console.error('Error fetching route from OSRM:', error);
+                alert(`Could not fetch route. Check console. Error: ${error.message}. Public OSRM server may be busy or rate-limiting.`);
+            }
+        }
+
+         function handleRouteError(message) {
+             console.error("OSRM API Error:", message);
+             totalDistanceP.textContent = 'Error calculating route.';
+             transportSuggestionsListUl.innerHTML = '<li>Could not calculate suggestions.</li>';
+             clearRouteDisplay();
+             clearRouteMarkers();
+         }
+
+        function updateTransportSuggestions(legs) {
+             transportSuggestionsListUl.innerHTML = ''; // Clear previous suggestions
+             if (!legs || legs.length === 0 || plannedRoutePoints.length < 2) return;
+
+             legs.forEach((leg, index) => {
+                 const startPoint = plannedRoutePoints[index];
+                 const endPoint = plannedRoutePoints[index + 1];
+                 if (!startPoint || !endPoint) return;
+
+                 const li = document.createElement('li');
+                 const distanceKm = (leg.distance / 1000).toFixed(2);
+                 li.textContent = `From ${startPoint.name} to ${endPoint.name} (${distanceKm} km)`;
+                 li.classList.toggle('transport-needed', leg.distance > TRANSPORT_SUGGESTION_THRESHOLD_METERS);
+                 li.title = leg.distance > TRANSPORT_SUGGESTION_THRESHOLD_METERS ? `Consider transport for this ${distanceKm} km segment.` : `Walk this ${distanceKm} km segment.`;
+                 transportSuggestionsListUl.appendChild(li);
+             });
+        }
+
+        function addRouteMarkers() {
+            clearRouteMarkers(); // Ensure no duplicates
+
+             if (plannedRoutePoints.length === 0) return;
+
+             plannedRoutePoints.forEach((point, index) => {
+                 const el = document.createElement('div');
+                 el.className = 'route-point-marker';
+                 el.textContent = index + 1; // Number the markers
+
+                 const popup = new maplibregl.Popup({ offset: 25, closeButton: false }) // offset from marker center
+                    .setHTML(`<h4>${index+1}. ${point.name}</h4><p>${point.info || 'No details available.'}</p>`);
+
+                 const marker = new maplibregl.Marker(el)
+                     .setLngLat([point.lng, point.lat])
+                     .setPopup(popup)
+                     .addTo(map);
+                 routeMarkers.push(marker);
+             });
+        }
+
+         function clearRouteMarkers() {
+             routeMarkers.forEach(marker => marker.remove());
+             routeMarkers = [];
+         }
+
+         function clearRouteDisplay() {
+            if (map && map.getSource('route')) {
+                map.getSource('route').setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+            }
+         }
+
+        function clearPlan(resetView = true) {
+            plannedRoutePoints = [];
+            clearRouteDisplay();
+            clearRouteMarkers();
+
+             // Clear clicked map marker if it exists
+             if (clickedMarker) clickedMarker.remove();
+             if (clickedMarkerPopup) clickedMarkerPopup.remove();
+             clickedMarker = null;
+             clickedMarkerPopup = null;
+
+            updatePlannerUI(); // Reset sidebar lists and summary sections
+
+            // Unselect list items in the current city's destination list
+             Object.values(destinationListItems).forEach(li => li.classList.remove('selected'));
+
+            if (resetView) {
+                // Optional: Reset map view to current city center
+                const cityData = CITIES_DATA[currentCity];
+                map.flyTo({
+                    center: cityData.center,
+                    zoom: cityData.zoom,
+                    pitch: 45,
+                    bearing: -10,
+                    duration: 1000
+                });
+            }
+        }
+
+        // --- Start the application ---
+        initializePlanner();
+
+    </script>
+</body>
+</html>
