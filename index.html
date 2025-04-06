@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portugal Travel Planner</title>
+    <title>Portugal Travel Planner :: Solmaz Asadpour FCT</title> <!-- Updated Title -->
 
     <!-- MapLibre GL JS CSS -->
     <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
@@ -19,8 +19,10 @@
 
         html, body {
             height: 100%;
-            font-family: sans-serif;
+            /* Enhanced Font Stack */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden; /* Prevent body scrollbars */
+            background-color: #e9ecef; /* Light background for contrast */
         }
 
         /* Main Layout Container */
@@ -32,28 +34,47 @@
 
         /* Planner Panel Styling */
         #planner-panel {
-            width: 350px; /* Wider panel */
+            width: 380px; /* Slightly wider */
             height: 100%;
-            background-color: #f8f9fa;
+            background-color: #ffffff; /* Clear white panel */
             border-right: 1px solid #dee2e6;
-            padding: 15px;
+            /* Added subtle shadow for depth */
+            box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px; /* Increased padding */
             overflow-y: auto;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
+            color: #495057; /* Default text color */
         }
 
-        #planner-panel h2, #planner-panel h3 {
+        #planner-panel h2 {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px; /* Reduced margin below h2 */
+            color: #343a40; /* Darker heading */
+            font-weight: 600;
             flex-shrink: 0;
         }
+        /* Attribution Styling */
+        #planner-panel .attribution {
+            font-size: 0.75em; /* Smaller */
+            color: #6c757d; /* Muted gray */
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px; /* Space below attribution */
+            flex-shrink: 0;
+        }
+
          #planner-panel h3 {
-             font-size: 1.1em;
-             margin-top: 15px;
-             color: #333;
-             border-bottom: 1px solid #ddd;
-             padding-bottom: 5px;
+             font-size: 1.2em; /* Slightly larger */
+             margin-top: 25px; /* More space above section titles */
+             margin-bottom: 12px;
+             color: #343a40;
+             /* Distinctive border */
+             border-bottom: 1px solid #eee;
+             padding-bottom: 8px;
+             font-weight: 600;
+             flex-shrink: 0;
          }
 
         .planner-section {
@@ -62,25 +83,37 @@
         }
         .planner-section label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 6px;
+            font-weight: 600; /* Bolder labels */
+            color: #495057;
+            font-size: 0.9em;
         }
-         .planner-section select, .planner-section button {
+         /* Consistent styling for select and button */
+         .planner-section select, .planner-section button, #clear-plan-btn {
             width: 100%;
-            padding: 8px;
+            padding: 10px 12px; /* More padding */
             margin-bottom: 10px;
-             border: 1px solid #ccc;
-             border-radius: 4px;
+            border: 1px solid #ced4da; /* Softer border */
+            border-radius: 5px; /* Slightly rounded corners */
+            font-size: 0.95em;
+            background-color: #fff; /* Ensure background */
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+         }
+         .planner-section select:focus, .planner-section button:focus {
+             border-color: #86b7fe; /* Blue border on focus */
+             outline: 0;
+             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue shadow on focus */
          }
 
         /* Lists styling */
         .scrollable-list {
-            max-height: 200px; /* Limit height for lists */
+            max-height: 220px; /* Increased height */
             overflow-y: auto;
-            border: 1px solid #eee;
-            padding: 5px;
+            border: 1px solid #e9ecef; /* Lighter border */
+            border-radius: 4px;
+            padding: 8px;
             margin-bottom: 10px;
-            background-color: #fff;
+            background-color: #f8f9fa; /* Subtle background for list area */
         }
         #destination-list, #daily-plan-list, #planned-destinations-list, #transport-suggestions-list {
             list-style: none;
@@ -88,85 +121,124 @@
         }
 
         #destination-list li, #daily-plan-list li {
-            padding: 8px 10px;
-            margin-bottom: 5px;
+            padding: 10px 12px; /* More padding */
+            margin-bottom: 6px;
             cursor: pointer;
             border-radius: 4px;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; /* Smooth transition */
             font-size: 0.9em;
-            border: 1px solid #eee;
-            background-color: #f9f9f9;
+            border: 1px solid transparent; /* Placeholder for border */
+            border-left: 3px solid transparent; /* Placeholder for selection indicator */
+            background-color: #fff; /* White list items */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Subtle shadow */
         }
         #destination-list li:hover, #daily-plan-list li:hover {
-            background-color: #e9ecef;
+            background-color: #f1f3f5; /* Slightly darker hover */
+            border-left-color: #adb5bd; /* Gray indicator on hover */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.07);
         }
+        /* Clearer selected state */
         #destination-list li.selected {
-            background-color: #cfe2ff;
-            border-color: #9ec5fe;
-            font-weight: bold;
+            background-color: #e7f1ff; /* Light blue background */
+            border-left: 3px solid #007bff; /* Blue indicator bar */
+            color: #0056b3; /* Darker blue text */
+            font-weight: 600; /* Bold text */
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
         }
 
         #plan-details {
            flex-grow: 1; /* Takes remaining space */
            overflow-y: auto; /* Scroll for long plans */
-           border-top: 1px solid #ccc;
-           margin-top: 15px;
-           padding-top: 10px;
+           border-top: 1px solid #dee2e6; /* Clearer separator */
+           margin-top: 20px;
+           padding-top: 15px;
         }
          #plan-details h4 {
-            margin-top: 10px;
-            margin-bottom: 5px;
-             font-size: 1em;
-             color: #555;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1.1em; /* Slightly larger */
+            color: #495057;
+            font-weight: 600;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+         }
+         #plan-details h4:first-child {
+             margin-top: 0;
          }
 
          #planned-destinations-list li {
-            padding: 5px 0;
-            font-size: 0.9em;
-             border-bottom: 1px dashed #eee;
+            padding: 8px 5px; /* Adjusted padding */
+            font-size: 0.95em;
+            border-bottom: 1px dotted #e9ecef; /* Lighter dot */
+            color: #212529;
+            display: flex;
+            align-items: center;
+         }
+         #planned-destinations-list li::before {
+             content: attr(data-number); /* Use data attribute for number */
+             display: inline-block;
+             width: 1.5em; /* Fixed width for number */
+             text-align: right;
+             margin-right: 8px;
+             font-weight: 600;
+             color: #007bff;
          }
          #planned-destinations-list li:last-child {
              border-bottom: none;
          }
 
         #plan-summary {
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 0.95em;
-            padding: 10px;
-            background-color: #e9ecef;
-            border-radius: 4px;
+            padding: 12px 15px; /* More padding */
+            background-color: #e9f7ff; /* Light blue background */
+            border-radius: 5px;
+            border: 1px solid #cce5ff; /* Light blue border */
+            color: #004085; /* Dark blue text */
         }
         #plan-summary p { margin-bottom: 5px; }
+        #plan-summary p:last-child { margin-bottom: 0; }
+
 
         #plan-transport li {
-             font-size: 0.85em;
-             margin-bottom: 8px;
-             padding-left: 20px;
+             font-size: 0.9em;
+             margin-bottom: 10px; /* More space between items */
+             padding-left: 25px; /* More space for icon */
              position: relative;
+             line-height: 1.4;
+             color: #343a40;
          }
          #plan-transport li::before {
-             content: "🚶";
+             /* Using unicode icons - consider font awesome or SVGs for better icons */
+             content: "🚶"; /* Walker */
              position: absolute;
-             left: 0; top: 0;
-             font-size: 1.1em;
+             left: 0; top: 1px;
+             font-size: 1.3em; /* Slightly larger icon */
+             color: #28a745; /* Green for walking */
          }
          #plan-transport li.transport-needed::before {
-             content: "🚌"; /* Simpler icon */
+             content: "🚌"; /* Bus */
+             color: #ffc107; /* Yellow/Orange for transport needed */
          }
 
 
         #clear-plan-btn {
-            padding: 10px 12px;
             cursor: pointer;
-            background-color: #dc3545;
+            background-color: #dc3545; /* Red */
             color: white;
-            border: none;
-            border-radius: 4px;
+            border: 1px solid #dc3545;
+            border-radius: 5px;
             font-size: 1em;
+            font-weight: 500;
             flex-shrink: 0;
             margin-top: auto; /* Push to bottom */
+            padding: 12px 15px; /* Consistent padding */
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
-        #clear-plan-btn:hover { background-color: #c82333; }
+        #clear-plan-btn:hover {
+            background-color: #c82333; /* Darker red on hover */
+            border-color: #bd2130;
+        }
 
         /* Map Container Styling */
         #map {
@@ -176,16 +248,17 @@
         }
 
          /* Loading indicator */
-        #map::before { content: 'Loading Map...'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5em; color: #555; z-index: 1; }
+        #map::before { content: 'Loading Map...'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5em; color: #6c757d; z-index: 1; background: rgba(255,255,255,0.7); padding: 10px 20px; border-radius: 5px;}
         #map.loaded::before { display: none; }
 
         /* Marker Animation */
-        .maplibregl-marker { cursor: pointer; } /* Make default marker clickable looking */
+        .maplibregl-marker { cursor: pointer; }
 
         .dropped-pin {
             width: 30px;
             height: 40px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="%23dc3545" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67a24 24 0 0 1-35.464 0zM192 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg>');
+            /* Using a slightly different pin color */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="%23e63946" d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67a24 24 0 0 1-35.464 0zM192 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
             transform-origin: bottom center;
@@ -200,40 +273,61 @@
 
         /* Route Point Marker Styling */
         .route-point-marker {
-            background-color: #0d6efd; /* Blue to match route */
+            background-color: #007bff; /* Consistent blue */
             color: white;
-            width: 22px;
-            height: 22px;
+            width: 24px; /* Slightly larger */
+            height: 24px;
             border-radius: 50%;
             border: 2px solid white;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 10px;
-            font-weight: bold;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            font-size: 11px;
+            font-weight: 600; /* Bolder number */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Enhanced shadow */
             cursor: pointer;
         }
 
          /* MapLibre Popup customization */
          .maplibregl-popup-content {
             font-size: 0.9em;
-            padding: 10px;
-            max-width: 250px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 12px 15px; /* More padding */
+            max-width: 280px; /* Wider */
+            box-shadow: 0 3px 15px rgba(0,0,0,0.15); /* Stronger shadow */
+            border-radius: 5px; /* Rounded corners */
          }
          .maplibregl-popup-content h4 {
-             margin: 0 0 5px 0;
-             font-size: 1.1em;
-             color: #333;
+             margin: 0 0 8px 0; /* More space below title */
+             font-size: 1.15em; /* Larger title */
+             color: #343a40; /* Darker heading */
+             font-weight: 600;
+             border-bottom: 1px solid #eee;
+             padding-bottom: 5px;
          }
          .maplibregl-popup-content p {
-             margin: 0;
-             color: #555;
+             margin: 0 0 5px 0;
+             color: #495057; /* Standard text color */
+             line-height: 1.4;
+         }
+         .maplibregl-popup-content p:last-child {
+             margin-bottom: 0;
          }
         .maplibregl-popup-close-button {
-            font-size: 1.5em;
-            padding: 0 5px;
+            font-size: 1.6em;
+            padding: 0 6px;
+            color: #6c757d; /* Muted close button */
+        }
+        .maplibregl-popup-close-button:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* Route line style */
+        #route-line {
+            paint: {
+                'line-color': '#007bff', /* Consistent blue */
+                'line-width': 6, /* Slightly thicker */
+                'line-opacity': 0.85
+            }
         }
 
     </style>
@@ -243,6 +337,8 @@
         <!-- Planner Panel -->
         <div id="planner-panel">
             <h2>Portugal Travel Planner</h2>
+            <!-- Added Attribution -->
+            <p class="attribution">Written and prepared by Solmaz Asadpour for FCT application.</p>
 
             <div class="planner-section">
                 <label for="city-select">Select City:</label>
@@ -274,8 +370,7 @@
                  </ul>
 
                  <div id="plan-summary" style="display: none;">
-                     <h4>Summary</h4>
-                     <p id="total-distance">Total Walking Distance: calculating...</p>
+                     <!-- Content dynamic -->
                  </div>
 
                  <div id="plan-transport" style="display: none;">
@@ -294,10 +389,9 @@
 
     <!-- MapLibre GL JS -->
     <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
-    <!-- Three.js (Optional for future custom 3D) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.min.js"></script>
-    <!-- Threebox (Optional for future custom 3D) -->
-    <script src="https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js" type="text/javascript"></script>
+    <!-- Three.js / Threebox (Optional - Kept for reference) -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js" type="text/javascript"></script> -->
 
     <!-- Custom JavaScript -->
     <script>
@@ -306,6 +400,7 @@
         const TRANSPORT_SUGGESTION_THRESHOLD_METERS = 1500; // 1.5km
 
         // --- City Data ---
+        // (Using the same CITIES_DATA structure as before)
         const CITIES_DATA = {
             "Lisbon": {
                 center: [-9.1393, 38.7223],
@@ -323,8 +418,11 @@
                 ],
                 dailyPlans: [
                     { name: "Day 1: History & Views", sequence: ["Lisbon Cathedral (Sé)", "São Jorge Castle", "Alfama District Viewpoint", "Praça do Comércio"] },
-                    { name: "Day 2: Belém & Discoveries", sequence: ["Jerónimos Monastery", "Belém Tower", "Padrão dos Descobrimentos"] }, // Note: Padrão not in list, add it or remove
-                    { name: "Day 3: Baixa & Bairro Alto", sequence: ["Santa Justa Lift", "Rossio Square", "Time Out Market"] } // Note: Rossio Square not in list
+                    // Note: Padrão & Rossio Square are not defined in destinations, OSRM might fail or route strangely if kept.
+                    // For robustness, ensure all destinations in plans exist in the main list.
+                    // Let's remove them for this example:
+                    { name: "Day 2: Belém Area", sequence: ["Jerónimos Monastery", "Belém Tower"] },
+                    { name: "Day 3: Baixa & Food", sequence: ["Santa Justa Lift", "Time Out Market"] }
                 ]
             },
             "Porto": {
@@ -347,15 +445,17 @@
             // Add more cities here...
         };
 
+
         // --- State Variables ---
         let map;
-        let tb; // Threebox instance (optional)
+        // let tb; // Threebox instance (optional)
         let currentCity = Object.keys(CITIES_DATA)[0]; // Start with the first city
         let plannedRoutePoints = []; // Array of {name, lng, lat, info} objects
         let destinationListItems = {}; // Cache of current city's list items {name: liElement}
         let routeMarkers = []; // Store markers placed on the route
         let clickedMarker = null; // Store the marker from a map click
         let clickedMarkerPopup = null; // Store the popup for the map click marker
+        let currentRouteLayerExists = false; // Track if route layer/source exist
 
         // --- DOM Element References ---
         const citySelect = document.getElementById('city-select');
@@ -363,10 +463,11 @@
         const dailyPlanListUl = document.getElementById('daily-plan-list');
         const plannedDestinationsListUl = document.getElementById('planned-destinations-list');
         const planSummaryDiv = document.getElementById('plan-summary');
-        const totalDistanceP = document.getElementById('total-distance');
+        // No direct totalDistanceP needed if integrated into planSummaryDiv
         const planTransportDiv = document.getElementById('plan-transport');
         const transportSuggestionsListUl = document.getElementById('transport-suggestions-list');
         const clearPlanBtn = document.getElementById('clear-plan-btn');
+        const mapElement = document.getElementById('map'); // Reference map container
 
         // --- Initialization ---
         function initializePlanner() {
@@ -380,45 +481,59 @@
             citySelect.value = currentCity;
 
             // Initialize Map
-            map = new maplibregl.Map({
-                container: 'map',
-                style: {
-                    version: 8,
-                    sources: { 'osm-tiles': { type: 'raster', tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; OSM contributors | Routing: OSRM' } },
-                    layers: [{ id: 'osm-raster-layer', type: 'raster', source: 'osm-tiles', minzoom: 0, maxzoom: 20 }]
-                },
-                center: CITIES_DATA[currentCity].center,
-                zoom: CITIES_DATA[currentCity].zoom,
-                pitch: 45,
-                bearing: -10,
-                antialias: true
-            });
+            try {
+                map = new maplibregl.Map({
+                    container: 'map',
+                    style: {
+                        version: 8,
+                        sources: { 'osm-tiles': { type: 'raster', tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OSM contributors</a> | Routing: <a href="http://project-osrm.org/" target="_blank">OSRM</a> | UI by Solmaz Asadpour' } }, // Added links & attribution
+                        layers: [{ id: 'osm-raster-layer', type: 'raster', source: 'osm-tiles', minzoom: 0, maxzoom: 20 }]
+                    },
+                    center: CITIES_DATA[currentCity].center,
+                    zoom: CITIES_DATA[currentCity].zoom,
+                    pitch: 45, // Initial pitch
+                    bearing: -10, // Initial bearing
+                    antialias: true
+                });
 
-            map.on('style.load', () => {
-                document.getElementById('map').classList.add('loaded');
-                // Optional: Initialize Threebox if needed for custom 3D later
-                // tb = new Threebox(map, map.getCanvas().getContext('webgl'), { defaultLights: true });
-                console.log("Map style loaded.");
-                addRouteLayerAndSource(); // Add empty layer/source for the route
-                updateCityUI(currentCity); // Load initial city UI
-            });
+                map.on('load', () => {
+                    mapElement.classList.add('loaded');
+                    console.log("Map loaded.");
+                    addRouteLayerAndSource(); // Ensure layer/source are ready
+                    updateCityUI(currentCity); // Load initial city UI
+                });
 
-            map.addControl(new maplibregl.NavigationControl());
-            map.addControl(new maplibregl.FullscreenControl());
+                 map.on('styledata', () => {
+                     // Ensures route layer is re-added if style changes (though not expected here)
+                     if (currentRouteLayerExists && !map.getLayer('route-line')) {
+                         addRouteLayerAndSource(true); // Force re-add if missing
+                     }
+                 });
 
-            // --- Event Listeners ---
-            citySelect.addEventListener('change', (e) => {
-                switchCity(e.target.value);
-            });
-            destinationListUl.addEventListener('click', handleDestinationClick);
-            dailyPlanListUl.addEventListener('click', handleDailyPlanClick);
-            clearPlanBtn.addEventListener('click', clearPlan);
-            map.on('click', handleMapClick); // Listener for map clicks
+                map.addControl(new maplibregl.NavigationControl());
+                map.addControl(new maplibregl.FullscreenControl());
 
-            map.on('error', (e) => {
-                console.error('MapLibre GL Error:', e.error);
-                alert('An error occurred with the map.');
-            });
+                // --- Event Listeners ---
+                citySelect.addEventListener('change', (e) => {
+                    switchCity(e.target.value);
+                });
+                destinationListUl.addEventListener('click', handleDestinationClick);
+                dailyPlanListUl.addEventListener('click', handleDailyPlanClick);
+                clearPlanBtn.addEventListener('click', () => clearPlan(true)); // Explicitly pass true for resetView
+                map.on('click', handleMapClick); // Listener for map clicks
+
+                map.on('error', (e) => {
+                    console.error('MapLibre GL Error:', e.error || e);
+                    alert('An error occurred with the map. Please check the console.');
+                    mapElement.classList.add('loaded'); // Hide loading indicator even on error
+                    mapElement.innerHTML = '<p style="text-align: center; padding: 20px; color: red;">Map failed to load.</p>'; // Show error on map
+                });
+
+            } catch (error) {
+                 console.error("Failed to initialize MapLibre:", error);
+                 alert("Failed to initialize the map. See console for details.");
+                 mapElement.innerHTML = '<p style="text-align: center; padding: 20px; color: red;">Map initialization failed.</p>';
+            }
         }
 
         // --- City & UI Update Functions ---
@@ -427,7 +542,7 @@
             if (cityName === currentCity || !CITIES_DATA[cityName]) return;
             currentCity = cityName;
             console.log("Switching to city:", currentCity);
-            clearPlan(); // Clear plan when switching cities
+            clearPlan(false); // Clear plan without resetting map view immediately
             updateCityUI(cityName);
             const cityData = CITIES_DATA[cityName];
             map.flyTo({
@@ -435,7 +550,7 @@
                 zoom: cityData.zoom,
                 pitch: 45,
                 bearing: -10,
-                duration: 2000
+                duration: 2000 // Smooth transition
             });
         }
 
@@ -446,26 +561,31 @@
             dailyPlanListUl.innerHTML = '';
 
             // Populate Destinations
-            if (cityData.destinations) {
+            if (cityData.destinations && Array.isArray(cityData.destinations)) {
                 cityData.destinations.forEach(dest => {
                     const li = document.createElement('li');
                     li.textContent = dest.name;
                     li.dataset.name = dest.name;
-                    li.dataset.lng = dest.lng;
-                    li.dataset.lat = dest.lat;
+                    // Store lng/lat/info directly for easier access if needed, although finding in CITIES_DATA is fine too
+                    // li.dataset.lng = dest.lng;
+                    // li.dataset.lat = dest.lat;
                     destinationListUl.appendChild(li);
                     destinationListItems[dest.name] = li; // Cache the element
                 });
+            } else {
+                console.warn(`No destinations array found for city: ${cityName}`);
             }
 
             // Populate Daily Plans
-            if (cityData.dailyPlans) {
+            if (cityData.dailyPlans && Array.isArray(cityData.dailyPlans)) {
                 cityData.dailyPlans.forEach((plan, index) => {
                     const li = document.createElement('li');
                     li.textContent = plan.name;
                     li.dataset.planIndex = index;
                     dailyPlanListUl.appendChild(li);
                 });
+            } else {
+                 console.warn(`No daily plans array found for city: ${cityName}`);
             }
         }
 
@@ -478,19 +598,30 @@
                 const cityData = CITIES_DATA[currentCity];
                 const destinationData = cityData.destinations.find(d => d.name === name);
 
-                if (destinationData && !listItem.classList.contains('selected')) {
-                     // Check if already in plan to prevent duplicates (optional)
-                     if (plannedRoutePoints.some(p => p.name === name)) return;
-
-                    plannedRoutePoints.push({ ...destinationData }); // Add copy to plan
-                    listItem.classList.add('selected');
-                    updatePlannerUIAndRoute();
-                } else if (destinationData && listItem.classList.contains('selected')) {
-                    // Optional: Allow deselecting by clicking again
-                     plannedRoutePoints = plannedRoutePoints.filter(p => p.name !== name);
-                     listItem.classList.remove('selected');
-                     updatePlannerUIAndRoute();
+                if (!destinationData) {
+                    console.error("Clicked destination data not found:", name);
+                    return;
                 }
+
+                const isSelected = listItem.classList.contains('selected');
+                const indexInPlan = plannedRoutePoints.findIndex(p => p.name === name);
+
+                if (!isSelected && indexInPlan === -1) {
+                    // Add to plan
+                    plannedRoutePoints.push({ ...destinationData }); // Add copy
+                    listItem.classList.add('selected');
+                } else if (isSelected && indexInPlan !== -1) {
+                    // Remove from plan
+                    plannedRoutePoints.splice(indexInPlan, 1);
+                    listItem.classList.remove('selected');
+                } else {
+                    // This case (e.g., selected class present but not in plan array) shouldn't happen with correct logic, but good to handle
+                    console.warn("State mismatch for destination:", name);
+                    listItem.classList.remove('selected'); // Correct UI state
+                    if (indexInPlan !== -1) plannedRoutePoints.splice(indexInPlan, 1); // Correct data state
+                }
+
+                updatePlannerUIAndRoute();
             }
         }
 
@@ -500,22 +631,34 @@
                  const cityData = CITIES_DATA[currentCity];
                  const selectedPlan = cityData.dailyPlans[planIndex];
 
-                 if (selectedPlan) {
+                 if (selectedPlan && selectedPlan.sequence) {
                      clearPlan(false); // Clear current plan without resetting map view
 
-                     plannedRoutePoints = selectedPlan.sequence
-                         .map(destName => cityData.destinations.find(d => d.name === destName))
-                         .filter(dest => dest !== undefined); // Find destination objects, filter out any not found
+                     const destinationsInPlan = selectedPlan.sequence
+                         .map(destName => {
+                              const dest = cityData.destinations.find(d => d.name === destName);
+                              if (!dest) console.warn(`Destination "${destName}" in plan "${selectedPlan.name}" not found in city data.`);
+                              return dest;
+                         })
+                         .filter(dest => dest !== undefined); // Filter out any not found
+
+                    if (destinationsInPlan.length !== selectedPlan.sequence.length) {
+                        alert(`Warning: Some destinations in plan "${selectedPlan.name}" could not be found. Check console.`);
+                    }
+
+                    plannedRoutePoints = destinationsInPlan;
 
                     // Visually select list items for this plan
-                     Object.values(destinationListItems).forEach(li => li.classList.remove('selected'));
-                     plannedRoutePoints.forEach(point => {
-                         if (destinationListItems[point.name]) {
-                             destinationListItems[point.name].classList.add('selected');
-                         }
-                     });
+                    Object.values(destinationListItems).forEach(li => li.classList.remove('selected'));
+                    plannedRoutePoints.forEach(point => {
+                        if (destinationListItems[point.name]) {
+                            destinationListItems[point.name].classList.add('selected');
+                        }
+                    });
 
-                     updatePlannerUIAndRoute();
+                    updatePlannerUIAndRoute();
+                 } else {
+                      console.error("Selected daily plan or its sequence not found:", planIndex);
                  }
              }
          }
@@ -524,6 +667,8 @@
              // Remove previous clicked marker & popup
              if (clickedMarker) clickedMarker.remove();
              if (clickedMarkerPopup) clickedMarkerPopup.remove();
+             clickedMarker = null; // Ensure references are cleared
+             clickedMarkerPopup = null;
 
              const coordinates = e.lngLat;
 
@@ -532,7 +677,7 @@
             el.className = 'dropped-pin';
 
              // Create Marker with custom element
-             clickedMarker = new maplibregl.Marker(el)
+             clickedMarker = new maplibregl.Marker({element: el, anchor: 'bottom'}) // Anchor at bottom tip
                  .setLngLat(coordinates)
                  .addTo(map);
 
@@ -542,11 +687,11 @@
                  .setHTML(`<strong>Clicked Location</strong><p>Lng: ${coordinates.lng.toFixed(5)}<br>Lat: ${coordinates.lat.toFixed(5)}</p>`)
                  .addTo(map);
 
-             // Optional: Remove marker after popup closes
-             clickedMarkerPopup.on('close', () => {
+             // Remove marker+popup when popup is closed
+             clickedMarkerPopup.once('close', () => { // Use 'once' to avoid multiple listeners
                  if (clickedMarker) clickedMarker.remove();
                  clickedMarker = null;
-                 clickedMarkerPopup = null;
+                 clickedMarkerPopup = null; // Clear reference
              });
 
              console.log(`Map clicked at: Lng: ${coordinates.lng}, Lat: ${coordinates.lat}`);
@@ -557,16 +702,22 @@
         // --- Planning & Routing Logic ---
 
         function updatePlannerUIAndRoute() {
-            updatePlannerUI(); // Update the text list in the sidebar
+            updatePlannerUI(); // Update the text list and summary sections in the sidebar
             if (plannedRoutePoints.length >= 2) {
                 calculateAndDrawRoute();
             } else {
                  clearRouteDisplay(); // Clear route line if < 2 points
                  clearRouteMarkers(); // Clear markers if < 2 points
+                 addRouteMarkers(); // Add marker for the single point (or no points)
                  // Optionally fly to the single point if needed
                  if (plannedRoutePoints.length === 1) {
                      map.flyTo({ center: [plannedRoutePoints[0].lng, plannedRoutePoints[0].lat], zoom: 15, duration: 1000});
-                      addRouteMarkers(); // Add marker for the single point
+                 }
+                 // Update summary for single/no point case
+                 if (plannedRoutePoints.length < 2) {
+                     planSummaryDiv.innerHTML = ''; // Clear summary content
+                     planSummaryDiv.style.display = 'none';
+                     planTransportDiv.style.display = 'none';
                  }
             }
         }
@@ -575,7 +726,7 @@
             plannedDestinationsListUl.innerHTML = ''; // Clear previous list
 
             if (plannedRoutePoints.length === 0) {
-                 plannedDestinationsListUl.innerHTML = '<li>Select destinations or a daily plan.</li>';
+                 plannedDestinationsListUl.innerHTML = '<li>Select destinations or a daily plan to begin.</li>';
                  planSummaryDiv.style.display = 'none';
                  planTransportDiv.style.display = 'none';
                  return;
@@ -583,101 +734,199 @@
 
             plannedRoutePoints.forEach((point, index) => {
                 const li = document.createElement('li');
-                li.textContent = `${index + 1}. ${point.name}`;
+                li.dataset.number = `${index + 1}.`; // Set number for ::before pseudo-element
+                li.textContent = ` ${point.name}`; // Add space after number
                 plannedDestinationsListUl.appendChild(li);
             });
 
+            // Reset summary/transport until route calculated
+            planSummaryDiv.innerHTML = '<p>Calculating route details...</p>';
             planSummaryDiv.style.display = 'block';
+            planTransportDiv.innerHTML = '<h4>Transport Suggestions</h4><ul id="transport-suggestions-list"><li>Calculating...</li></ul>'; // Recreate inner ul structure
             planTransportDiv.style.display = 'block';
-            totalDistanceP.textContent = 'Total Walking Distance: calculating...';
-            transportSuggestionsListUl.innerHTML = '<li>Calculating suggestions...</li>';
         }
 
-         function addRouteLayerAndSource() {
+        // Add or ensure the existence of the route source and layer
+         function addRouteLayerAndSource(forceReAdd = false) {
+            if (!map) return; // Map not ready
+
+            const sourceExists = map.getSource('route');
+            const layerExists = map.getLayer('route-line');
+
+             if (forceReAdd && layerExists) map.removeLayer('route-line');
+             if (forceReAdd && sourceExists) map.removeSource('route');
+
             if (!map.getSource('route')) {
-                map.addSource('route', { type: 'geojson', data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } } });
+                map.addSource('route', {
+                     type: 'geojson',
+                     data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } }
+                 });
+                console.log("Route source added.");
             }
             if (!map.getLayer('route-line')) {
-                map.addLayer({ id: 'route-line', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#0d6efd', 'line-width': 5, 'line-opacity': 0.8 } });
+                map.addLayer({
+                    id: 'route-line',
+                    type: 'line',
+                    source: 'route',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#007bff', 'line-width': 6, 'line-opacity': 0.85 } // Use updated style
+                }, /* Optional: beforeLayerId */); // Add before labels if desired: map.style.stylesheet.layers.find(l => l.type === 'symbol').id
+                 console.log("Route layer added.");
             }
+             currentRouteLayerExists = true;
          }
 
         async function calculateAndDrawRoute() {
-            if (plannedRoutePoints.length < 2) return;
+            if (!map || plannedRoutePoints.length < 2) return;
+            addRouteLayerAndSource(); // Ensure layer exists before using it
             clearRouteMarkers(); // Clear old markers before drawing new route/markers
 
             const coordsString = plannedRoutePoints.map(p => `${p.lng},${p.lat}`).join(';');
             const requestUrl = `${OSRM_API_URL}${coordsString}?overview=full&geometries=geojson&steps=true`;
 
             console.log("Requesting route:", requestUrl);
+            planSummaryDiv.innerHTML = '<p>Calculating route...</p>'; // Update status
+            planSummaryDiv.style.display = 'block';
+             planTransportDiv.style.display = 'block'; // Show transport section
+             document.getElementById('transport-suggestions-list').innerHTML = '<li>Calculating suggestions...</li>'; // Reset suggestions
+
             try {
                 const response = await fetch(requestUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                     const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
                 const data = await response.json();
 
                 if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
                     const route = data.routes[0];
-                    map.getSource('route').setData(route.geometry); // Update map source
-                    totalDistanceP.textContent = `Total Walking Distance: ${(route.distance / 1000).toFixed(2)} km`;
+                    const routeGeometry = route.geometry;
+
+                    // Update map source data
+                    const routeSource = map.getSource('route');
+                    if (routeSource) {
+                         routeSource.setData(routeGeometry);
+                         console.log("Route data updated on map.");
+                    } else {
+                        console.error("Route source not found when trying to set data.");
+                         // Attempt to re-add and set data (fallback)
+                         addRouteLayerAndSource(true);
+                         map.getSource('route')?.setData(routeGeometry);
+                    }
+
+
+                    // Update summary panel
+                    planSummaryDiv.innerHTML = `
+                        <h4>Route Summary</h4>
+                        <p id="total-distance">Total Walking Distance: <strong>${(route.distance / 1000).toFixed(2)} km</strong></p>
+                        <p>Estimated Walking Time: <strong>${(route.duration / 60).toFixed(0)} minutes</strong></p>
+                    `;
+
                     updateTransportSuggestions(data.routes[0].legs);
-                    addRouteMarkers(); // Add markers AFTER route is calculated
+                    addRouteMarkers(); // Add markers AFTER route is calculated and drawn
 
                     // Fit map to route bounds
-                    const bounds = route.geometry.coordinates.reduce((bounds, coord) => bounds.extend(coord), new maplibregl.LngLatBounds(route.geometry.coordinates[0], route.geometry.coordinates[0]));
-                    map.fitBounds(bounds, { padding: 80, duration: 1500, pitch: map.getPitch(), bearing: map.getBearing() });
+                    if (routeGeometry && routeGeometry.coordinates && routeGeometry.coordinates.length > 0) {
+                         const bounds = routeGeometry.coordinates.reduce((bounds, coord) => bounds.extend(coord), new maplibregl.LngLatBounds(routeGeometry.coordinates[0], routeGeometry.coordinates[0]));
+                         map.fitBounds(bounds, {
+                            padding: { top: 80, bottom: 80, left: 400, right: 80 }, // Increased left padding for sidebar
+                             maxZoom: 16, // Don't zoom in too extremely
+                             duration: 1500,
+                             pitch: map.getPitch(), // Maintain current pitch/bearing
+                             bearing: map.getBearing()
+                         });
+                    } else {
+                         console.warn("Route geometry missing coordinates for bounds fitting.");
+                    }
+
                 } else {
-                    handleRouteError(data.message || "No route found");
+                    handleRouteError(data.message || "No route found or error in OSRM response");
                 }
             } catch (error) {
                 handleRouteError(error.message);
-                console.error('Error fetching route from OSRM:', error);
-                alert(`Could not fetch route. Check console. Error: ${error.message}. Public OSRM server may be busy or rate-limiting.`);
+                console.error('Error fetching/processing route from OSRM:', error);
+                // Display more user-friendly error
+                 alert(`Could not calculate the route. The public OSRM server might be busy, rate-limiting requests, or unable to route between the selected points.\n\nError: ${error.message}`);
             }
         }
 
          function handleRouteError(message) {
-             console.error("OSRM API Error:", message);
-             totalDistanceP.textContent = 'Error calculating route.';
-             transportSuggestionsListUl.innerHTML = '<li>Could not calculate suggestions.</li>';
+             console.error("OSRM API or Route Error:", message);
+             planSummaryDiv.innerHTML = `<h4>Route Error</h4><p style="color: red;">Could not calculate route: ${message}</p>`;
+             planSummaryDiv.style.display = 'block';
+             const transportList = document.getElementById('transport-suggestions-list');
+             if (transportList) transportList.innerHTML = '<li style="color: red;">Could not calculate suggestions.</li>';
+             planTransportDiv.style.display = 'block'; // Keep section visible to show error
              clearRouteDisplay();
              clearRouteMarkers();
+             addRouteMarkers(); // Re-add markers for the points themselves, even without a route
          }
 
         function updateTransportSuggestions(legs) {
-             transportSuggestionsListUl.innerHTML = ''; // Clear previous suggestions
-             if (!legs || legs.length === 0 || plannedRoutePoints.length < 2) return;
+             const transportList = document.getElementById('transport-suggestions-list');
+             if (!transportList) { // Ensure the element exists
+                 console.error("Transport suggestions list element not found.");
+                 return;
+             }
+             transportList.innerHTML = ''; // Clear previous suggestions
+
+             if (!legs || legs.length === 0 || plannedRoutePoints.length < 2) {
+                  transportList.innerHTML = '<li>Not enough points for suggestions.</li>';
+                  return;
+             }
 
              legs.forEach((leg, index) => {
                  const startPoint = plannedRoutePoints[index];
                  const endPoint = plannedRoutePoints[index + 1];
+                 // Should always exist if legs exist, but check anyway
                  if (!startPoint || !endPoint) return;
 
                  const li = document.createElement('li');
                  const distanceKm = (leg.distance / 1000).toFixed(2);
-                 li.textContent = `From ${startPoint.name} to ${endPoint.name} (${distanceKm} km)`;
-                 li.classList.toggle('transport-needed', leg.distance > TRANSPORT_SUGGESTION_THRESHOLD_METERS);
-                 li.title = leg.distance > TRANSPORT_SUGGESTION_THRESHOLD_METERS ? `Consider transport for this ${distanceKm} km segment.` : `Walk this ${distanceKm} km segment.`;
-                 transportSuggestionsListUl.appendChild(li);
+                 const durationMin = (leg.duration / 60).toFixed(0);
+                 const needsTransport = leg.distance > TRANSPORT_SUGGESTION_THRESHOLD_METERS;
+
+                 li.innerHTML = `From <strong>${startPoint.name}</strong> to <strong>${endPoint.name}</strong>: ${distanceKm} km (~${durationMin} min walk).`;
+                 if (needsTransport) {
+                     li.innerHTML += ` <strong style="color: #fd7e14;">Consider transport.</strong>`; // Use inline style for emphasis
+                 }
+
+                 li.classList.toggle('transport-needed', needsTransport);
+                 li.title = needsTransport
+                    ? `Distance (${distanceKm} km) is over ${TRANSPORT_SUGGESTION_THRESHOLD_METERS/1000}km. Public transport, taxi, or ride-share recommended.`
+                    : `Walkable distance (${distanceKm} km).`;
+                 transportList.appendChild(li);
              });
         }
 
         function addRouteMarkers() {
             clearRouteMarkers(); // Ensure no duplicates
 
-             if (plannedRoutePoints.length === 0) return;
+             if (!map || plannedRoutePoints.length === 0) return;
 
              plannedRoutePoints.forEach((point, index) => {
                  const el = document.createElement('div');
                  el.className = 'route-point-marker';
                  el.textContent = index + 1; // Number the markers
 
-                 const popup = new maplibregl.Popup({ offset: 25, closeButton: false }) // offset from marker center
-                    .setHTML(`<h4>${index+1}. ${point.name}</h4><p>${point.info || 'No details available.'}</p>`);
+                 const popupContent = `
+                     <h4>${index + 1}. ${point.name}</h4>
+                     <p>${point.info || 'No details available.'}</p>
+                     <small>Coords: ${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}</small>
+                 `;
 
-                 const marker = new maplibregl.Marker(el)
+                 const popup = new maplibregl.Popup({ offset: 30, closeButton: true, closeOnClick: false, maxWidth: '280px' }) // offset from marker center, allow close button
+                    .setHTML(popupContent);
+
+                 const marker = new maplibregl.Marker({element: el, anchor: 'center'}) // Center anchor for circle
                      .setLngLat([point.lng, point.lat])
                      .setPopup(popup)
                      .addTo(map);
+
+                 // Optional: Open popup on hover (can be noisy)
+                 // marker.getElement().addEventListener('mouseenter', () => { if (!popup.isOpen()) marker.togglePopup(); });
+                 // marker.getElement().addEventListener('mouseleave', () => { if (popup.isOpen()) marker.togglePopup(); });
+
                  routeMarkers.push(marker);
              });
         }
@@ -688,12 +937,18 @@
          }
 
          function clearRouteDisplay() {
-            if (map && map.getSource('route')) {
-                map.getSource('route').setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+             if (!map) return;
+            const routeSource = map.getSource('route');
+            if (routeSource) {
+                routeSource.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+                console.log("Route display cleared.");
+            } else {
+                // console.warn("Attempted to clear route display, but source 'route' doesn't exist.");
             }
          }
 
         function clearPlan(resetView = true) {
+            console.log("Clearing plan. Reset view:", resetView);
             plannedRoutePoints = [];
             clearRouteDisplay();
             clearRouteMarkers();
@@ -709,13 +964,13 @@
             // Unselect list items in the current city's destination list
              Object.values(destinationListItems).forEach(li => li.classList.remove('selected'));
 
-            if (resetView) {
-                // Optional: Reset map view to current city center
+            if (resetView && map) {
+                // Reset map view to current city center
                 const cityData = CITIES_DATA[currentCity];
                 map.flyTo({
                     center: cityData.center,
                     zoom: cityData.zoom,
-                    pitch: 45,
+                    pitch: 45, // Reset pitch/bearing too
                     bearing: -10,
                     duration: 1000
                 });
@@ -723,7 +978,8 @@
         }
 
         // --- Start the application ---
-        initializePlanner();
+        // Use DOMContentLoaded to ensure the DOM is fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', initializePlanner);
 
     </script>
 </body>
